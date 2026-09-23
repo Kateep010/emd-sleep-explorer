@@ -1,0 +1,90 @@
+# EMD × 睡眠腦波：經驗模態分解互動導覽
+
+> AI Agent × Biomedical Signal Analysis 課程作業（黃鍔院士演講前導）。
+> 主題：**經驗模態分解（EMD）在睡眠研究中的意義**。
+
+| | 連結 |
+| --- | --- |
+| 🌐 網站（GitHub Pages） | https://kateep010.github.io/emd-sleep-explorer/ |
+| 💻 原始碼 | https://github.com/Kateep010/emd-sleep-explorer |
+
+## 這個網站做什麼
+
+一個純靜態、零依賴的互動教學網站，把 EMD 的每一步做成可以動手操作的實驗，並直接對**真實的 PhysioNet Sleep-EDF 睡眠腦波**在瀏覽器裡即時運算：
+
+| 章節 | 內容 | 互動 |
+| --- | --- | --- |
+| 01 為什麼 | 傅立葉分析對非線性、非平穩訊號的盲點；瞬時頻率 | 調整非線性程度 ε，比較傅立葉頻譜與 Hilbert 瞬時頻率 |
+| 02 演算法 | 篩選（sifting）：極值 → 三次樣條包絡線 → 平均 → 相減 → SD 停止準則 | 一步一步（或自動播放）把 IMF 篩出來，可切換合成／真實訊號與 SD 門檻 |
+| 03 真實腦波 | 五個睡眠階段（W/N1/N2/N3/REM）的 30 秒真實 EEG 拆成 IMF，標上平均瞬時頻率與頻帶 | 選階段、片段、EMD／EEMD、集成次數與雜訊振幅 |
+| 04 Hilbert 譜 | Hilbert 譜 vs. STFT 頻譜圖、邊際譜 vs. 傅立葉譜 | 動態範圍切換，滑鼠讀值 |
+| 05 EEMD | 模態混疊的成因與 EEMD 的解法 | 合成「慢波 + 間歇紡錘波」，調整振幅、雜訊、集成次數 |
+| 06 睡眠分期 | Hassan & Bhuiyan 流程的簡化重現：IMF 特徵 → 散佈圖 → 留一法最近質心 | 任選兩個 IMF 特徵作 X/Y 軸 |
+| 07 文獻 | 16 篇以 Crossref DOI 查證的文獻，分方法／分期／呼吸中止／紡錘波四條線 | 標籤篩選 |
+| 08 討論 | 與 AI 討論的紀錄、設計決策、已知限制 | — |
+
+## 技術重點
+
+- **演算法全部以原生 JavaScript 從頭實作**（`js/emd.js`，無任何第三方套件）：
+  局部極值、自然三次樣條（Thomas 演算法）、Rilling 鏡像邊界延伸、篩選（SD 與 S-number 停止準則）、EMD、EEMD（可中斷的非同步版本）、
+  任意長度 FFT（Bluestein）、Hilbert 轉換／瞬時頻率、Hilbert 譜、STFT 頻譜圖、功率譜。
+- **單元測試**：`node tests/test_emd.mjs`（樣條、FFT 對照直接 DFT、Hilbert 對純音的瞬時頻率、EMD 完備重建、雙音分離、模態混疊 EMD vs EEMD、16 個真實 epoch 的重建）。
+- **圖表**：`js/charts.js` 自製 canvas 折線圖／熱圖／散佈圖，含十字游標與 tooltip、鍵盤操作、HiDPI、深淺色主題。
+- **資料**：`data/epochs.json`（同內容的 `data/epochs.js` 供 `file://` 直接開啟）— Sleep-EDF Expanded 受試者 SC4002E0，EEG Fpz-Cz，100 Hz，
+  每階段 3–4 個 30 秒 epoch，由 `tools/extract_epochs.py`（MNE + YASA）產生：避開階段邊界、排除 >150 µV 雜訊、N2 優先挑選含紡錘波片段、清醒期排除 >80 µV 眼動漂移。
+
+## 本地執行
+
+```bash
+git clone https://github.com/Kateep010/emd-sleep-explorer.git
+cd emd-sleep-explorer
+python3 -m http.server 8000      # 或直接雙擊 index.html 也可以
+# 測試
+node tests/test_emd.mjs
+```
+
+## 部署
+
+本站為純靜態網站（無建置步驟），三種平台皆與 GitHub repo 連動：
+
+| 平台 | 方式 | 狀態 |
+| --- | --- | --- |
+| **GitHub Pages** | Settings → Pages → Deploy from branch `main` / root | ✅ 已上線，每次 push 自動更新 |
+| **Zeabur** | Zeabur 專案 → Deploy from Git → 選此 repo。repo 內沒有語言專屬檔案，Zeabur 會自動以靜態模式（Caddy）部署；`_headers` 亦相容 | ⚠️ 2026 年 9 月 Zeabur 共享叢集已停止服務，新專案需先綁定付費專用伺服器（見下） |
+| **Cloudflare Workers** | `npx wrangler login && npx wrangler deploy`（設定檔 `wrangler.jsonc`，static assets 模式） | 設定檔已備妥 |
+
+### 關於 Zeabur
+
+作業原規劃部署至 Zeabur。查閱 Zeabur 官方文件（[專用伺服器](https://zeabur.com/docs/zh-TW/dedicated-server)、[Free Plan](https://zeabur.com/docs/en-US/pricing/free-plan)）後確認：
+「共享叢集（已停止服務）」，建立專案前必須先綁定或購買伺服器（按月固定計費）。
+因此以 GitHub Pages 作為主要公開網址；repo 已是 Zeabur 可直接辨識的靜態專案，若日後綁定伺服器，
+在 Zeabur 控制台選擇此 repo 即可部署，無需修改任何檔案。
+
+## 文獻（皆經 Crossref 查證）
+
+1. Huang NE, et al. (1998). The empirical mode decomposition and the Hilbert spectrum for nonlinear and non-stationary time series analysis. *Proc. R. Soc. Lond. A* 454:903–995. doi:10.1098/rspa.1998.0193
+2. Huang NE, Wu Z, Long SR, Arnold KC, Chen X, Blank K (2009). On instantaneous frequency. *Adv. Adapt. Data Anal.* 1(2):177–229. doi:10.1142/S1793536909000096
+3. Wu Z, Huang NE (2009). Ensemble empirical mode decomposition: a noise-assisted data analysis method. *Adv. Adapt. Data Anal.* 1(1):1–41. doi:10.1142/S1793536909000047
+4. Rehman N, Mandic DP (2010). Multivariate empirical mode decomposition. *Proc. R. Soc. A* 466:1291–1302. doi:10.1098/rspa.2009.0502
+5. Torres ME, Colominas MA, Schlotthauer G, Flandrin P (2011). A complete ensemble empirical mode decomposition with adaptive noise. *IEEE ICASSP*, 4144–4147. doi:10.1109/ICASSP.2011.5947265
+6. Lo MT, Tsai PH, Lin PF, Lin C, Hsin YL (2009). The nonlinear and nonstationary properties in EEG signals: probing the complex fluctuations by Hilbert–Huang transform. *Adv. Adapt. Data Anal.* 1(3):461–482. doi:10.1142/S1793536909000199
+7. Li Y, Fan Y, Gu L, Tong Q (2009). Sleep stage classification based on EEG Hilbert-Huang transform. *IEEE ICIEA*, 3676–3681. doi:10.1109/ICIEA.2009.5138842
+8. Yang Z, Yang L, Qi D (2006). Detection of spindles in sleep EEGs using a novel algorithm based on the Hilbert-Huang transform. In *Wavelet Analysis and Applications*, Birkhäuser, 543–559. doi:10.1007/978-3-7643-7778-6_40
+9. Mendez MO, et al. (2010). Automatic screening of obstructive sleep apnea from the ECG based on empirical mode decomposition and wavelet analysis. *Physiol. Meas.* 31(3):273–289. doi:10.1088/0967-3334/31/3/001
+10. Yeh JR, Peng CK, Lo MT, et al. (2013). Investigating the interaction between heart rate variability and sleep EEG using nonlinear algorithms. *J. Neurosci. Methods* 219(2):233–239. doi:10.1016/j.jneumeth.2013.08.008
+11. Schlotthauer G, Di Persia LE, Larrateguy LD, Milone DH (2014). Screening of obstructive sleep apnea with empirical mode decomposition of pulse oximetry. *Med. Eng. Phys.* 36(8):1074–1080. doi:10.1016/j.medengphy.2014.05.008
+12. Hassan AR, Bhuiyan MIH (2016). Computer-aided sleep staging using CEEMDAN and bootstrap aggregating. *Biomed. Signal Process. Control* 24:1–10. doi:10.1016/j.bspc.2015.09.002
+13. Hassan AR, Bhuiyan MIH (2017). Automated identification of sleep states from EEG signals by means of EEMD and random under sampling boosting. *Comput. Methods Programs Biomed.* 140:201–210. doi:10.1016/j.cmpb.2016.12.015
+14. Liu C, Tan B, Fu M, Li J, Wang J, Hou F (2021). Automatic sleep staging with a single-channel EEG based on ensemble empirical mode decomposition. *Physica A* 567:125685. doi:10.1016/j.physa.2020.125685
+15. Setiawan F, Lin CW (2022). A deep learning framework for automatic sleep apnea classification based on EMD derived from single-lead ECG. *Life* 12(10):1509. doi:10.3390/life12101509
+16. Li Y, Song K, Zhang Y, Karray F (2024). Method and system for automated detection of sleep spindles using a single EEG channels based TEO and EMD. *Expert Syst. Appl.* 249:123661. doi:10.1016/j.eswa.2024.123661
+
+## 資料授權
+
+Kemp B, Zwinderman AH, Tuk B, Kamphuisen HAC, Oberyé JJL. Sleep-EDF Database Expanded, PhysioNet — Open Data Commons Attribution License v1.0。
+本站僅供教學，不作醫療用途。程式碼採 MIT 授權。
+
+## 製作過程
+
+網站在 Claude Code（Claude Fable 5.1）協助下完成：文獻以 Crossref API 逐篇查證、演算法從論文重新實作並以單元測試驗證、
+真實資料以 MNE/YASA 抽取，圖表與版面經 headless Chromium 截圖檢查（深淺色、手機寬度）。討論與設計決策整理在網站第 08 節。
