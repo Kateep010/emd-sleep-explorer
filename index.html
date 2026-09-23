@@ -17,7 +17,7 @@
   <div class="wrap">
     <a class="brand" href="#top"><svg class="leaf" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 23C9 13 16 8 24 8c0 8-5 15-15 15z" fill="var(--s3)"/><path d="M10 22l10-10" stroke="var(--bg)" stroke-width="1.6" stroke-linecap="round"/></svg>夜夜YAYA<small>EMD × 睡眠腦波</small></a>
     <nav class="top" aria-label="章節">
-      <a href="#huang">黃鍔院士</a><a href="#why">為什麼</a><a href="#algorithm">演算法</a><a href="#real">真實腦波</a><a href="#hilbert">Hilbert 譜</a><a href="#mixing">EEMD</a><a href="#staging">睡眠分期</a><a href="#night">整夜</a><a href="#papers">文獻</a><a href="#discussion">討論</a>
+      <a href="#huang">黃鍔</a><a href="#why">為什麼</a><a href="#algorithm">演算法</a><a href="#real">真實腦波</a><a href="#hilbert">Hilbert</a><a href="#mixing">EEMD</a><a href="#staging">分期</a><a href="#night">整夜</a><a href="#papers">文獻</a><a href="#discussion">討論</a>
     </nav>
     <button id="theme-toggle" class="icon-btn" type="button" aria-label="切換深淺色主題">☾ / ☀</button>
   </div>
@@ -29,21 +29,18 @@
   <div class="wrap hero-inner">
     <p class="eyebrow">黃鍔院士 · Empirical Mode Decomposition × Sleep EEG</p>
     <h1><span class="brand-big">夜夜<em>YAYA</em></span><span class="sub">把一夜的腦波，一葉一葉剝開</span></h1>
-    <p class="lead">睡眠腦波是典型的<strong>非線性、非平穩</strong>訊號：紡錘波突然出現又消失、慢波的振幅與頻率隨時間漂移。黃鍔院士 1998 年提出的經驗模態分解（EMD）不預設任何基底函數，而是讓資料自己「說出」它包含哪些尺度，一層一層（一葉一葉）剝出本質模態函數。這個網站把 EMD、EEMD 與 Hilbert 譜的每一步做成可以動手操作的實驗，並直接對<strong>真實的 PhysioNet Sleep-EDF 整夜腦波</strong>即時運算。</p>
+    <p class="lead">睡眠腦波是<strong>非線性、非平穩</strong>的訊號，傅立葉分析看不清它。黃鍔院士 1998 年提出的經驗模態分解（EMD）讓資料自己說出它包含哪些尺度。這個網站把 EMD 的每一步做成可以動手的實驗，並直接對<strong>真實的 Sleep-EDF 整夜腦波</strong>即時運算。</p>
+    <ol class="steps">
+      <li><b>為什麼</b><span>傅立葉的盲點，與瞬時頻率如何補上</span></li>
+      <li><b>演算法</b><span>一步一步親手把 IMF 篩出來</span></li>
+      <li><b>睡眠研究</b><span>真實腦波、整夜結構、自動分期與文獻</span></li>
+    </ol>
     <ul class="chips">
-      <li>演算法全部以原生 JavaScript 從頭實作，附單元測試與 PyEMD 交叉驗證</li>
-      <li>資料：Sleep-EDF 受試者 SC4002E0 整夜 1128 個 epoch，EEG Fpz-Cz，100 Hz</li>
-      <li>25 篇文獻皆以 Crossref DOI 查證</li>
-      <li>無大型圖檔、無外部程式庫，全站載入約 0.6 MB</li>
-      <li><a href="https://github.com/Kateep010/emd-sleep-explorer" target="_blank" rel="noopener">GitHub 原始碼 ↗</a></li>
-      <li>鏡像：<a href="https://emd-sleep-explorer.emd-sleep-explorer.workers.dev" target="_blank" rel="noopener">Cloudflare Workers ↗</a> · <a href="https://kateep010.github.io/emd-sleep-explorer/" target="_blank" rel="noopener">GitHub Pages ↗</a></li>
+      <li>原生 JavaScript 實作 · 附測試與 PyEMD 交叉驗證</li>
+      <li>Sleep-EDF 真實整夜腦波 · 1128 個 epoch</li>
+      <li>25 篇 Crossref 查證文獻</li>
+      <li><a href="https://github.com/Kateep010/emd-sleep-explorer" target="_blank" rel="noopener">GitHub ↗</a></li>
     </ul>
-    <div class="howto">
-      <div><b>1. 先懂「為什麼」</b><span>用一個非線性波形看傅立葉分析的盲點，以及瞬時頻率如何解決它。</span></div>
-      <div><b>2. 一步一步跑演算法</b><span>找極值、畫包絡線、取平均、相減——親手把一個 IMF 篩出來。</span></div>
-      <div><b>3. 回到睡眠研究</b><span>拆解五個睡眠階段的真實腦波，再放大到整夜 1128 個 epoch，串到自動分期與 25 篇文獻。</span></div>
-    </div>
-    <p class="note">背景動畫：真實 N2 期腦波（藍）與它的前三個 IMF（綠、橘、紫）沿時間捲動；系統設定「減少動態效果」時會靜止。</p>
   </div>
 </section>
 
@@ -51,12 +48,10 @@
 <section class="block" id="huang">
   <div class="wrap">
     <h2><span class="num">00</span>黃鍔院士與 EMD：從 NASA 到睡眠研究</h2>
-    <div class="grid-2 huang-grid">
-      <div class="prose">
+    <div class="prose">
         <p><strong>黃鍔（Norden E. Huang）</strong>，1937 年生於湖北，1960 年畢業於國立臺灣大學，1967 年取得約翰霍普金斯大學流體力學博士。他在 NASA 戈達德太空飛行中心工作期間，為了分析非線性、非平穩的海洋波浪資料，於 1998 年提出<strong>經驗模態分解（EMD）與 Hilbert 譜</strong>，NASA 將這套方法命名為 Hilbert–Huang 轉換（HHT），並於 2003 年選為 NASA 年度發明。他於 2000 年獲選美國國家工程院院士、2004 年獲選中央研究院院士，2006 年起任國立中央大學講座教授，在台灣成立數據分析方法研究中心，把 HHT 帶進地球科學、工程與生醫訊號等領域。</p>
-        <p>下面的時間線列出他本人（或與長期合作者）的關鍵論文，以及每一篇對本站內容的意義。點「本站第 n 節」可以直接跳到對應的互動實驗。</p>
-      </div>
-      <div class="huang-facts">
+    </div>
+      <div class="facts-strip">
         <div><b>1998</b><span>EMD／HHT 原始論文（Proc. R. Soc. A）</span></div>
         <div><b>2000</b><span>美國國家工程院院士</span></div>
         <div><b>2003</b><span>NASA 年度發明：HHT</span></div>
@@ -65,12 +60,15 @@
         <div><b>2009</b><span>EEMD：噪音輔助的資料分析</span></div>
         <div><b>2016</b><span>Holo-Hilbert 譜分析（HHSA）</span></div>
       </div>
-    </div>
+    <p class="dek">下面是他本人與長期合作者的關鍵論文，每一篇都標註它對本站哪一節的意義。</p>
     <ol class="timeline">
       <li><span class="yr">1998</span><div><b>The empirical mode decomposition and the Hilbert spectrum for nonlinear and non-stationary time series analysis</b><span class="ve">Huang NE, Shen Z, Long SR, et al. · Proc. R. Soc. Lond. A 454:903–995 · <a href="https://doi.org/10.1098/rspa.1998.0193" target="_blank" rel="noopener">DOI</a></span><span class="why">定義 IMF、篩選程序、SD 停止準則、瞬時頻率與 Hilbert 譜——本站第 <a href="#algorithm">02</a>、<a href="#hilbert">04</a> 節的實作依據。</span></div></li>
       <li><span class="yr">2003</span><div><b>A confidence limit for the empirical mode decomposition and Hilbert spectral analysis</b><span class="ve">Huang NE, Wu MLC, Long SR, et al. · Proc. R. Soc. Lond. A 459:2317–2345 · <a href="https://doi.org/10.1098/rspa.2003.1123" target="_blank" rel="noopener">DOI</a></span><span class="why">S-number 停止準則與 EMD 結果的信賴區間；本站 <code>sNumber</code> 選項的來源。</span></div></li>
       <li><span class="yr">2004</span><div><b>A study of the characteristics of white noise using the empirical mode decomposition method</b><span class="ve">Wu Z, Huang NE · Proc. R. Soc. Lond. A 460:1597–1611 · <a href="https://doi.org/10.1098/rspa.2003.1221" target="_blank" rel="noopener">DOI</a></span><span class="why">證明白噪音經 EMD 後各 IMF 的能量與週期呈固定關係，可用來判斷 IMF 是否只是噪音——也是 EEMD 的理論鋪墊。</span></div></li>
       <li><span class="yr">2005</span><div><b>Hilbert–Huang Transform and Its Applications（專書，2014 年二版）</b><span class="ve">Huang NE, Shen SSP（編） · World Scientific · <a href="https://doi.org/10.1142/5862" target="_blank" rel="noopener">DOI</a></span><span class="why">HHT 的系統性教科書，含方法、數學問題與跨領域應用。</span></div></li>
+    </ol>
+    <details class="more"><summary>顯示其餘 6 篇（2005–2019）</summary>
+    <ol class="timeline">
       <li><span class="yr">2008</span><div><b>A review on Hilbert-Huang transform: method and its applications to geophysical studies</b><span class="ve">Huang NE, Wu Z · Reviews of Geophysics 46:RG2006 · <a href="https://doi.org/10.1029/2007RG000228" target="_blank" rel="noopener">DOI</a></span><span class="why">十年回顧：方法的優缺點、邊界效應、停止準則與模態混疊的整理，本站第 09 節的限制討論大量參考此文。</span></div></li>
       <li><span class="yr">2009</span><div><b>Ensemble empirical mode decomposition: a noise-assisted data analysis method</b><span class="ve">Wu Z, Huang NE · Adv. Adapt. Data Anal. 1:1–41 · <a href="https://doi.org/10.1142/S1793536909000047" target="_blank" rel="noopener">DOI</a></span><span class="why">EEMD 解決模態混疊——本站第 <a href="#mixing">05</a> 節的實驗與第 <a href="#night">07</a> 節的 EEMD 特徵。</span></div></li>
       <li><span class="yr">2009</span><div><b>On instantaneous frequency</b><span class="ve">Huang NE, Wu Z, Long SR, et al. · Adv. Adapt. Data Anal. 1:177–229 · <a href="https://doi.org/10.1142/S1793536909000096" target="_blank" rel="noopener">DOI</a></span><span class="why">瞬時頻率何時有物理意義——本站第 <a href="#why">01</a> 節。</span></div></li>
@@ -78,6 +76,7 @@
       <li><span class="yr">2016</span><div><b>On Holo-Hilbert spectral analysis: a full informational spectral representation for nonlinear and non-stationary data</b><span class="ve">Huang NE, Hu K, Yang ACC, et al. · Phil. Trans. R. Soc. A 374:20150206 · <a href="https://doi.org/10.1098/rsta.2015.0206" target="_blank" rel="noopener">DOI</a></span><span class="why">對 IMF 的振幅包絡再做一層 EMD，分開頻率調變與振幅調變；與台灣團隊（楊靜修、梁偉光、葉家榮、阮啟弘、彭仲康）合作，適合分析睡眠中慢波—紡錘波這類跨頻率耦合。</span></div></li>
       <li><span class="yr">2019</span><div><b>Unraveling nonlinear electrophysiologic processes in the human visual system with full dimension spectral analysis</b><span class="ve">Nguyen KT, Liang WK, Lee V, Chang WS, Muggleton NG, Yeh JR, Huang NE, Juan CH · Scientific Reports 9 · <a href="https://doi.org/10.1038/s41598-019-53286-z" target="_blank" rel="noopener">DOI</a></span><span class="why">HHSA 應用於人類 EEG 的示範（中央大學認知神經科學研究所），顯示黃鍔院士近年的重心已轉向腦電訊號。</span></div></li>
     </ol>
+    </details>
     <p class="note">生平資料來源：Wikipedia「Norden E. Huang」條目（出生、學歷、院士年份、中央大學職位）、NASA 技術報告（HHT 命名與 2003 年年度發明）。所有論文資料皆以 Crossref 查證。</p>
   </div>
 </section>
@@ -88,11 +87,14 @@
     <h2><span class="num">01</span>為什麼睡眠訊號需要 EMD？</h2>
     <div class="prose">
       <p>傅立葉分析把訊號展開成<strong>固定頻率、固定振幅</strong>的正弦波之和。這件事隱含兩個假設：訊號是<strong>線性</strong>的（波形可以疊加而不互相影響）而且<strong>平穩</strong>的（統計性質不隨時間改變）。睡眠腦波兩者都不滿足：</p>
+      <details class="more"><summary>深入說明</summary>
+
       <ul>
         <li><strong>非平穩</strong>：N2 期的紡錘波（sleep spindle，11–16 Hz）只持續 0.5–2 秒；K 複合波是單一的瞬態事件；從 N2 進入 N3 時，慢波逐漸變大變慢。</li>
         <li><strong>非線性</strong>：神經元集體放電產生的波形不是完美正弦波，常常「上升快、下降慢」。傅立葉必須用一堆<em>諧波</em>（2 倍頻、3 倍頻……）拼出這種形狀，但那些諧波在生理上並不存在。</li>
       </ul>
       <p>EMD 的想法完全不同：它不問「這個訊號由哪些正弦波組成」，而是問「這個訊號<strong>自己的振盪有幾種時間尺度</strong>」。它把訊號拆成少數幾個<strong>本質模態函數（Intrinsic Mode Function, IMF）</strong>，每個 IMF 都是振幅與頻率可隨時間改變的單一振盪，因此可以用 Hilbert 轉換算出<strong>瞬時頻率</strong>。下面的小實驗就是黃鍔 1998 年論文裡的經典例子。</p>
+      </details>
     </div>
     <div class="card">
       <h3>實驗：一個「非線性」的波，傅立葉看到諧波，Hilbert 看到頻率在擺動</h3>
@@ -102,7 +104,7 @@
       </div>
       <div class="chart-title">訊號（前 5 秒）</div>
       <canvas id="why-signal" class="viz" aria-label="非線性波形的時間序列"></canvas>
-      <p class="note">橫軸：時間（秒）；縱軸：振幅（無單位）。滑鼠移到圖上可讀值，鍵盤 ← → 可移動游標。</p>
+      <details class="how"><summary>怎麼看</summary><p>橫軸：時間（秒）；縱軸：振幅（無單位）。滑鼠移到圖上可讀值，鍵盤 ← → 可移動游標。</p></details>
       <div class="grid-2">
         <div>
           <div class="chart-title">傅立葉功率頻譜</div>
@@ -129,12 +131,15 @@
         <li>整段訊號的<strong>極值個數</strong>與<strong>零交越個數</strong>相等，或最多差 1；</li>
         <li>在任一時間點，由局部極大值構成的<strong>上包絡線</strong>與局部極小值構成的<strong>下包絡線</strong>，其平均值為 0。</li>
       </ol>
+      <details class="more"><summary>深入說明</summary>
+
       <p>篩選就是不斷把「包絡線平均」從訊號裡扣掉，直到剩下的部分滿足上面兩個條件：</p>
       <div class="formula">h<sub>1</sub>(t) = x(t) − m<sub>1</sub>(t)，&nbsp; h<sub>11</sub>(t) = h<sub>1</sub>(t) − m<sub>11</sub>(t)，&nbsp; … 直到 h<sub>1k</sub> 是 IMF，記為 c<sub>1</sub>(t)</div>
       <p>什麼時候停？黃鍔建議用相鄰兩次篩選結果的標準差：</p>
       <div class="formula">SD = Σ<sub>t</sub> |h<sub>1(k−1)</sub>(t) − h<sub>1k</sub>(t)|² / Σ<sub>t</sub> h<sub>1(k−1)</sub>(t)² &nbsp;&lt;&nbsp; 0.2 ～ 0.3</div>
       <p>抽出 c<sub>1</sub> 後，殘差 r<sub>1</sub> = x − c<sub>1</sub> 再重複同樣的程序得到 c<sub>2</sub>、c<sub>3</sub>……直到殘差變成單調函數（沒有足夠的極值可以畫包絡線）。最後 x(t) = Σ c<sub>i</sub>(t) + r<sub>n</sub>(t)，<strong>分解是完備的</strong>：所有 IMF 加上殘差可以完全重建原訊號。</p>
       <div class="callout">包絡線用<strong>三次樣條（cubic spline）</strong>通過極值點；訊號兩端沒有極值可以參考，我們採用 Rilling 等人的<strong>鏡像延伸</strong>把最靠近邊界的極值對稱反射出去，避免包絡線在邊緣「甩尾」。這是實作 EMD 最容易被忽略、但影響最大的細節之一。</div>
+      </details>
     </div>
     <div class="card">
       <h3>親手篩出 IMF</h3>
@@ -162,10 +167,10 @@
       <div class="msg" id="sift-msg" aria-live="polite">按「下一步」開始。</div>
       <div class="chart-title">目前的 h(t)：訊號、極值、包絡線與其平均</div>
       <canvas id="sift-main" class="viz" aria-label="篩選過程：訊號、極值、上下包絡線與平均"></canvas>
-      <p class="note">藍：目前的 h(t)；橘點／橘線：局部極大值與上包絡線；綠點／綠線：局部極小值與下包絡線；紫：包絡線平均 m(t)。縱軸 µV。</p>
+      <details class="how"><summary>怎麼看</summary><p>藍：目前的 h(t)；橘點／橘線：局部極大值與上包絡線；綠點／綠線：局部極小值與下包絡線；紫：包絡線平均 m(t)。縱軸 µV。</p></details>
       <div class="chart-title">h(t) − m(t)：下一輪的候選 IMF</div>
       <canvas id="sift-h" class="viz" aria-label="扣掉包絡線平均後的候選 IMF"></canvas>
-      <p class="note">紅：h(t) − m(t)。若 SD 小於門檻且極值數與零交越數相差 ≤ 1，就被接受為 IMF；否則成為下一輪的 h(t)。</p>
+      <details class="how"><summary>怎麼看</summary><p>紅：h(t) − m(t)。若 SD 小於門檻且極值數與零交越數相差 ≤ 1，就被接受為 IMF；否則成為下一輪的 h(t)。</p></details>
       <div id="sift-imfs"></div>
     </div>
   </div>
@@ -188,24 +193,25 @@
           <button type="button" data-stage="REM" aria-pressed="false"><span class="sw" style="background:var(--s5)"></span>REM</button>
         </span>
         <label>片段 <select id="real-epoch"></select></label>
-      </div>
-      <div class="controls">
+        <span class="sep"></span>
         <label><input type="radio" name="real-method" value="emd" checked> EMD</label>
         <label><input type="radio" name="real-method" value="eemd"> EEMD</label>
-        <label>集成次數 <input id="real-ens" type="range" min="10" max="200" step="10" value="50"><span class="val" id="real-ens-val">50</span></label>
-        <label>雜訊振幅（× 標準差）<input id="real-noise" type="range" min="0.05" max="0.5" step="0.05" value="0.2"><span class="val" id="real-noise-val">0.20</span></label>
-        <label><input id="real-samescale" type="checkbox"> 所有 IMF 用同一振幅尺度</label>
         <progress id="real-progress" value="0" max="1" hidden></progress>
+        <details class="adv"><summary>進階參數</summary>
+          <label>集成次數 <input id="real-ens" type="range" min="10" max="200" step="10" value="50"><span class="val" id="real-ens-val">50</span></label>
+          <label>雜訊振幅（× 標準差）<input id="real-noise" type="range" min="0.05" max="0.5" step="0.05" value="0.2"><span class="val" id="real-noise-val">0.20</span></label>
+          <label><input id="real-samescale" type="checkbox"> 所有 IMF 用同一振幅尺度</label>
+        </details>
       </div>
       <div class="chart-title">原始訊號（µV）</div>
       <canvas id="real-signal" class="viz" aria-label="原始睡眠腦波 30 秒"></canvas>
-      <p class="note">一個 30 秒 epoch，橫軸秒、縱軸 µV。顏色對應上方的睡眠階段。</p>
+      <details class="how"><summary>怎麼看</summary><p>一個 30 秒 epoch，橫軸秒、縱軸 µV。顏色對應上方的睡眠階段。</p></details>
       <p class="caption" id="real-note"></p>
       <div class="chart-title">本質模態函數（IMF）：由高頻到低頻</div>
       <div id="real-imfs"></div>
       <div class="chart-title">殘差 r(t)：趨勢</div>
       <canvas id="real-residue" class="viz" aria-label="殘差"></canvas>
-      <p class="note">殘差是最後剩下的單調趨勢（沒有足夠極值可再篩選），通常是緩慢的基線漂移。</p>
+      <details class="how"><summary>怎麼看</summary><p>殘差是最後剩下的單調趨勢（沒有足夠極值可再篩選），通常是緩慢的基線漂移。</p></details>
       <div class="grid-2" style="margin-top:14px">
         <div>
           <h4>各頻帶能量占比（把 IMF 依平均瞬時頻率歸類）</h4>
@@ -228,7 +234,10 @@
     <h2><span class="num">04</span>Hilbert 譜 vs. 傅立葉頻譜圖</h2>
     <div class="prose">
       <p>對每個 IMF 做 Hilbert 轉換，得到解析訊號 z(t) = c(t) + i·H[c(t)] = a(t)·e<sup>iθ(t)</sup>，瞬時振幅 a(t) 與瞬時頻率 ω(t) = dθ/dt。把所有 IMF 的 (t, ω, a²) 疊到時間–頻率平面，就是 <strong>Hilbert 譜</strong>（Hilbert–Huang Transform, HHT）。它與短時傅立葉（STFT）頻譜圖的差別在於：STFT 的時間解析度與頻率解析度互相牽制（視窗 2 秒 → 頻率解析度只有 0.5 Hz，且任何事件都被抹成 2 秒寬），而 Hilbert 譜的頻率是逐點算出來的，短暫的紡錘波會呈現為一道清楚的短線。</p>
+      <details class="more"><summary>深入說明</summary>
+
       <p class="caption">兩張圖使用第 03 節目前選取的片段。顏色為相對能量（對數尺度，0 dB = 該圖最大值）。</p>
+      </details>
     </div>
     <div class="card">
       <div class="controls">
@@ -237,9 +246,9 @@
       </div>
       <div class="grid-2">
         <div><div class="chart-title">Hilbert 譜（EMD + Hilbert 轉換）</div><canvas id="hs-hilbert" class="viz" aria-label="Hilbert 時頻能量譜"></canvas></div>
-      <div><div class="chart-title">Hilbert 譜（EMD + Hilbert 轉換）</div><canvas id="hs-hilbert" class="viz" aria-label="Hilbert 時頻能量譜"></canvas><p class="note">每個像素 0.2 s × 0.25 Hz；顏色深淺為該格內所有 IMF 的 a² 總和（對數尺度，右側色條由淡到深）。空白代表該時刻沒有任何 IMF 落在這個頻率。</p></div>
+      <div><div class="chart-title">Hilbert 譜（EMD + Hilbert 轉換）</div><canvas id="hs-hilbert" class="viz" aria-label="Hilbert 時頻能量譜"></canvas><details class="how"><summary>怎麼看</summary><p>每個像素 0.2 s × 0.25 Hz；顏色深淺為該格內所有 IMF 的 a² 總和（對數尺度，右側色條由淡到深）。空白代表該時刻沒有任何 IMF 落在這個頻率。</p></details></div>
         <div><div class="chart-title">STFT 頻譜圖（Hann 視窗 2 秒）</div><canvas id="hs-stft" class="viz" aria-label="短時傅立葉頻譜圖"></canvas></div>
-      <div><div class="chart-title">STFT 頻譜圖（Hann 視窗 2 秒）</div><canvas id="hs-stft" class="viz" aria-label="短時傅立葉頻譜圖"></canvas><p class="note">同一片段的短時傅立葉功率；2 秒視窗使任何事件在時間上被抹成約 2 秒寬、頻率解析度約 0.5 Hz。</p></div>
+      <div><div class="chart-title">STFT 頻譜圖（Hann 視窗 2 秒）</div><canvas id="hs-stft" class="viz" aria-label="短時傅立葉頻譜圖"></canvas><details class="how"><summary>怎麼看</summary><p>同一片段的短時傅立葉功率；2 秒視窗使任何事件在時間上被抹成約 2 秒寬、頻率解析度約 0.5 Hz。</p></details></div>
       </div>
       <div class="chart-title">邊際譜比較：Hilbert 邊際譜（對時間積分）vs. 傅立葉功率譜（皆以最大值正規化）</div>
       <canvas id="hs-marginal" class="viz" aria-label="Hilbert 邊際譜與傅立葉功率譜"></canvas>
@@ -254,7 +263,10 @@
     <h2><span class="num">05</span>模態混疊與集成經驗模態分解（EEMD）</h2>
     <div class="prose">
       <p>EMD 最出名的弱點是<strong>模態混疊（mode mixing）</strong>：當一個高頻振盪只<strong>間歇</strong>出現（例如紡錘波），有它的時段極值密集、沒它的時段極值稀疏，同一個 IMF 就會一下子裝著 14 Hz、一下子裝著 1 Hz；反過來，同一個尺度也可能被拆到不同 IMF。這正是睡眠腦波最常見的情況。</p>
+      <details class="more"><summary>深入說明</summary>
+
       <p>Wu 與 Huang（2009）的解法很巧妙：在訊號上<strong>加入白噪音</strong>再分解，重複很多次，把結果<strong>平均</strong>。白噪音均勻填滿整個時間–頻率平面，提供一把「均勻的尺」讓每個時段的極值密度一致；而不同次試驗的噪音彼此獨立，平均之後互相抵消，殘留噪音的量級為 ε/√N。這就是 EEMD。代價是運算量乘以 N，而且各次分解的 IMF 相加不再完全等於原訊號——後來的 CEEMDAN（Torres et al., 2011）就是為了修正這一點。</p>
+      </details>
     </div>
     <div class="card">
       <h3>實驗：1 Hz 慢波 + 兩段 14 Hz 短暫振盪（模擬慢波上的紡錘波）</h3>
@@ -266,7 +278,7 @@
       </div>
       <div class="chart-title">合成訊號</div>
       <canvas id="mix-signal" class="viz" aria-label="合成訊號"></canvas>
-      <p class="note">橘色底色標示 14 Hz 短暫振盪出現的兩段時間（3–4.5 s、9–10.5 s）。</p>
+      <details class="how"><summary>怎麼看</summary><p>橘色底色標示 14 Hz 短暫振盪出現的兩段時間（3–4.5 s、9–10.5 s）。</p></details>
       <div class="grid-2">
         <div><h4>EMD</h4><div id="mix-emd"></div></div>
         <div><h4>EEMD</h4><div id="mix-eemd"></div></div>
@@ -283,7 +295,10 @@
     <h2><span class="num">06</span>從 IMF 到自動睡眠分期</h2>
     <div class="prose">
       <p>睡眠分期是把整夜的 PSG 每 30 秒判成 W / N1 / N2 / N3 / REM 之一。人工判讀費時且判讀者之間一致性有限，因此自動分期是睡眠研究的長期課題。Hassan 與 Bhuiyan（2016, 2017）的作法是把<strong>單導程 EEG</strong> 用 CEEMDAN 或 EEMD 拆成 IMF，對每個 IMF 計算平均、變異數、偏態、峰度等統計特徵，再交給集成式分類器（bagging、RUSBoost）；Liu 等人（2021）也用 EEMD 特徵做單導程自動分期。這些工作的共同邏輯是：<strong>IMF 是資料自適應的頻帶</strong>，能比固定的濾波器頻帶更貼近每一段訊號真正的振盪成分。</p>
+      <details class="more"><summary>深入說明</summary>
+
       <p>下面用本站的 16 個真實片段重現這個想法的第一步：對每個片段做 EMD，算出 IMF 特徵，在二維平面上看看不同睡眠階段是否分得開。這只是<strong>示意</strong>——真正的研究使用數千個 epoch 與交叉驗證。</p>
+      </details>
     </div>
     <div class="card">
       <div class="controls">
@@ -291,7 +306,7 @@
         <label>Y 軸特徵 <select id="stg-y"></select></label>
       </div>
       <canvas id="stg-scatter" class="viz" aria-label="睡眠階段特徵散佈圖"></canvas>
-      <p class="note">每個符號是一個 30 秒 epoch，顏色與形狀同時表示睡眠階段；空心大符號為各階段質心。滑鼠靠近可看片段編號與數值。</p>
+      <details class="how"><summary>怎麼看</summary><p>每個符號是一個 30 秒 epoch，顏色與形狀同時表示睡眠階段；空心大符號為各階段質心。滑鼠靠近可看片段編號與數值。</p></details>
       <div class="msg" id="stg-acc"></div>
       <details class="tbl"><summary>顯示所有片段的特徵表</summary>
         <div class="scroll-x"><table class="data"><thead><tr><th>片段</th><th>階段</th><th>δ 能量</th><th>θ 能量</th><th>α 能量</th><th>σ 能量</th><th>β 能量</th><th>IMF1 頻率</th><th>IMF2 頻率</th><th>主 IMF 頻率</th><th>RMS</th><th>IMF1 峰度</th></tr></thead><tbody id="stg-table"></tbody></table></div>
@@ -311,44 +326,47 @@
     <div class="card">
       <div class="chart-title">專家判讀睡眠圖（hypnogram）· SC4002E0</div>
       <canvas id="night-hypno" class="viz" aria-label="整夜睡眠圖"></canvas>
-      <p class="note">縱軸由下而上：N3、N2、N1、REM、W（愈上面愈清醒）；橫軸為自熄燈前 30 分鐘起算的小時數。每晚約 4–5 個週期，前半夜 N3 多、後半夜 REM 長。</p>
-      <div class="controls" style="margin-top:12px">
+      <details class="how"><summary>怎麼看</summary><p>縱軸由下而上：N3、N2、N1、REM、W（愈上面愈清醒）；橫軸為自熄燈前 30 分鐘起算的小時數。每晚約 4–5 個週期，前半夜 N3 多、後半夜 REM 長。</p></details>
+      <div class="controls">
         <label>特徵 <select id="night-feat"></select></label>
         <label>平滑（移動中位數） <select id="night-smooth"><option value="1">不平滑</option><option value="5" selected>5 個 epoch（2.5 分鐘）</option><option value="15">15 個 epoch（7.5 分鐘）</option></select></label>
       </div>
       <canvas id="night-feat-chart" class="viz" aria-label="整夜 IMF 特徵"></canvas>
       <p class="caption">背景色標示專家判讀的 N3（黃）與 REM（粉）時段。試試「δ 頻帶 IMF 能量占比」與「訊號 RMS」：每一個 N3 時段都對應一個高峰；再看「IMF1 平均瞬時頻率」在 REM 與清醒時上升。</p>
-      <div class="grid-2" style="margin-top:14px">
-        <div>
-          <h4>各階段的特徵中位數（整夜）</h4>
-          <div class="scroll-x"><table class="data"><thead><tr><th>特徵</th><th>W</th><th>N1</th><th>N2</th><th>N3</th><th>REM</th></tr></thead><tbody id="night-table"></tbody></table></div>
-          <p class="caption">σ 與 α 頻帶的中位數接近 0 並不代表沒有紡錘波或 α 波，而是 IMF 的平均頻率大約逐階減半（Flandrin et al., 2004 的濾波器組特性），很少剛好落在 12–16 Hz；這正是文獻改用 EEMD／CEEMDAN 或直接用 IMF 統計動差的原因。</p>
-        </div>
-        <div>
-          <h4>整夜留一法分類：從兩個特徵到 Hassan &amp; Bhuiyan 式的特徵向量</h4>
-          <div class="controls">
-            <label>特徵來源 <select id="night-src"><option value="emd">EMD</option><option value="eemd">EEMD（50 次集成，固定 8 個模態）</option></select></label>
+    </div>
+    <div class="card">
+      <h3>整夜留一法分類：從兩個特徵到 Hassan &amp; Bhuiyan 式的特徵向量</h3>
+      <div class="controls">
+        <label>特徵來源 <select id="night-src"><option value="emd">EMD</option><option value="eemd">EEMD（50 次集成，固定 8 個模態）</option></select></label>
             <label>特徵集 <select id="night-fs"><option value="two">兩個特徵（下方 X／Y）</option><option value="all">全部 10 個摘要特徵</option><option value="modes">摘要 + 每個模態的頻率與能量（僅 EEMD，26 個）</option></select></label>
             <label>分類器 <select id="night-clf"><option value="nc">最近質心</option><option value="knn">k-NN（k = 7）</option></select></label>
-          </div>
-          <div class="controls">
-            <label>X <select id="night-x"></select></label>
+        <span class="sep"></span>
+        <label>X <select id="night-x"></select></label>
             <label>Y <select id="night-y"></select></label>
-          </div>
-          <div class="msg" id="night-acc"></div>
-          <div class="scroll-x"><table class="data" id="night-cm"><thead><tr><th>專家 ＼ 預測</th><th>W</th><th>N1</th><th>N2</th><th>N3</th><th>REM</th></tr></thead><tbody></tbody></table></div>
-          <p class="note">留一法（leave-one-out）：每個 epoch 用其餘 1126 個 epoch 訓練後預測。所有特徵先標準化（z-score）。EEMD 資料（約 250 KB）在切換時才載入。</p>
-        </div>
       </div>
-      <h4 style="margin-top:18px">結果階梯：特徵與分類器一步步加上去會怎樣？</h4>
-      <div class="scroll-x"><table class="data ladder"><thead><tr><th>設定</th><th>特徵數</th><th>準確率</th><th>Cohen's κ</th><th>備註</th></tr></thead><tbody>
+      <div class="msg" id="night-acc"></div>
+      <div class="grid-2">
+        <div>
+          <div class="chart-title">混淆矩陣（列：專家判讀，欄：預測）</div>
+          <div class="scroll-x"><table class="data" id="night-cm"><thead><tr><th>專家 ＼ 預測</th><th>W</th><th>N1</th><th>N2</th><th>N3</th><th>REM</th></tr></thead><tbody></tbody></table></div>
+          <details class="how"><summary>怎麼看</summary><p>留一法（leave-one-out）：每個 epoch 用其餘 1126 個 epoch 訓練後預測。所有特徵先標準化（z-score）。EEMD 資料（約 250 KB）在切換時才載入。</p></details>
+        </div>
+        <div>
+          <div class="chart-title">結果階梯：特徵與分類器一步步加上去</div>
+          <div class="scroll-x"><table class="data ladder"><thead><tr><th>設定</th><th>特徵數</th><th>準確率</th><th>Cohen's κ</th><th>備註</th></tr></thead><tbody>
         <tr><td>EMD · δ 能量 × RMS · 最近質心</td><td>2</td><td>68.3 %</td><td>0.58</td><td>本節預設；只抓到「慢波多不多」</td></tr>
         <tr><td>EMD · 10 個摘要特徵 · k-NN</td><td>10</td><td>82.7 %</td><td>0.77</td><td>加入 θ／β 能量、IMF1 頻率、峰度</td></tr>
         <tr><td>EEMD · 10 個摘要特徵 · k-NN</td><td>10</td><td>84.5 %</td><td>0.79</td><td>EEMD 使各 epoch 的模態對齊，σ／α 能量不再幾乎為 0</td></tr>
         <tr><td>EEMD · 摘要 + 8 個模態的頻率與能量 · k-NN</td><td>26</td><td>84.2 %</td><td>0.79</td><td>Hassan &amp; Bhuiyan 式「逐模態統計量」特徵向量</td></tr>
         <tr><td>參考：YASA（LightGBM，數十個頻譜／時域特徵；Week 1 作業）</td><td>—</td><td>84.2 %</td><td>0.79</td><td>同一位受試者、同一段夜間紀錄</td></tr>
       </tbody></table></div>
-      <p class="note">上表由 <code>tools/eval_night.mjs</code> 離線計算，與本頁互動結果一致。注意這是<strong>單一受試者內</strong>的留一法：相鄰 epoch 高度相關，數字會比跨受試者驗證樂觀；它說明的是「IMF 特徵蘊含多少睡眠結構的資訊」，而非可推廣的分期效能。</p>
+          <details class="how"><summary>怎麼看</summary><p>上表由 <code>tools/eval_night.mjs</code> 離線計算，與本頁互動結果一致。注意這是<strong>單一受試者內</strong>的留一法：相鄰 epoch 高度相關，數字會比跨受試者驗證樂觀；它說明的是「IMF 特徵蘊含多少睡眠結構的資訊」，而非可推廣的分期效能。</p></details>
+        </div>
+      </div>
+      <details class="more"><summary>各階段的特徵中位數（整夜）</summary>
+        <div class="scroll-x"><table class="data"><thead><tr><th>特徵</th><th>W</th><th>N1</th><th>N2</th><th>N3</th><th>REM</th></tr></thead><tbody id="night-table"></tbody></table></div>
+        <p class="caption">σ 與 α 頻帶的中位數接近 0 並不代表沒有紡錘波或 α 波，而是 IMF 的平均頻率大約逐階減半（Flandrin et al., 2004 的濾波器組特性），很少剛好落在 12–16 Hz；這正是文獻改用 EEMD／CEEMDAN 或直接用 IMF 統計動差的原因。</p>
+      </details>
     </div>
   </div>
 </section>
@@ -423,7 +441,7 @@
   <div class="wrap">
     <p>資料來源：Kemp B, et al. Sleep-EDF Database Expanded (PhysioNet)，Open Data Commons Attribution License v1.0；受試者 SC4002E0，EEG Fpz-Cz。本站僅供教學，不作醫療用途。</p>
     <p>網址：<a href="https://kateep010.github.io/emd-sleep-explorer/">GitHub Pages</a> · <a href="https://emd-sleep-explorer.emd-sleep-explorer.workers.dev">Cloudflare Workers</a>。程式碼：<a href="https://github.com/Kateep010/emd-sleep-explorer" target="_blank" rel="noopener">github.com/Kateep010/emd-sleep-explorer</a>（MIT）。EMD／EEMD／FFT／Hilbert 轉換皆為原生 JavaScript 實作，附 <code>tests/test_emd.mjs</code> 單元測試與 PyEMD 交叉驗證（<code>docs/validation.md</code>）。</p>
-    <p>夜夜YAYA · AI Agent × Biomedical Signal Analysis 課程作業 · 黃鍔院士演講前導 · 2026 年 9 月。</p>
+    <p>夜夜YAYA · AI Agent × Biomedical Signal Analysis 課程作業 · 黃鍔院士演講前導 · 2026 年 9 月。首頁背景動畫為真實 N2 期腦波與其前三個 IMF；系統設定「減少動態效果」時會靜止。</p>
   </div>
 </footer>
 
