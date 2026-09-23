@@ -36,6 +36,7 @@
       <li>25 篇文獻皆以 Crossref DOI 查證</li>
       <li>無大型圖檔、無外部程式庫，全站載入約 0.6 MB</li>
       <li><a href="https://github.com/Kateep010/emd-sleep-explorer" target="_blank" rel="noopener">GitHub 原始碼 ↗</a></li>
+      <li>鏡像：<a href="https://emd-sleep-explorer.emd-sleep-explorer.workers.dev" target="_blank" rel="noopener">Cloudflare Workers ↗</a> · <a href="https://kateep010.github.io/emd-sleep-explorer/" target="_blank" rel="noopener">GitHub Pages ↗</a></li>
     </ul>
     <div class="howto">
       <div><b>1. 先懂「為什麼」</b><span>用一個非線性波形看傅立葉分析的盲點，以及瞬時頻率如何解決它。</span></div>
@@ -409,7 +410,7 @@
       <details><summary>IMF 就等於 δ、θ、α、σ、β 頻帶嗎？</summary><div class="a"><p>不是。IMF 是資料自適應的，同一個 IMF 的瞬時頻率在 30 秒內可能從 3 Hz 漂到 8 Hz；不同 epoch 的「IMF 3」也不一定對應同一個頻帶。本站用能量加權的平均瞬時頻率把 IMF「暫時」歸到傳統頻帶只是為了方便閱讀。做分類時要特別小心「IMF 編號對齊」的問題——這也是 EEMD 固定模態數、MEMD 對齊多通道的動機之一。</p></div></details>
       <details><summary>第 06 節的分期示意為什麼只有 16 個片段？準確率能相信嗎？</summary><div class="a"><p>16 個片段是為了讓瀏覽器能即時算完整條流程（EMD 每個 epoch 約 1–3 毫秒）。留一法最近質心的準確率只能說明「這兩個特徵有沒有區分力」，不能推論到真實效能；正式研究用數千個 epoch、多位受試者與交叉驗證，而且 N1 期在人工判讀之間的一致性本來就低。</p></div></details>
       <details><summary>資料為什麼選 Sleep-EDF SC4002E0？</summary><div class="a"><p>它是課程 Week 1 作業指定的公開資料，我們已在先前作業用 YASA 做過自動分期（準確率 84.2%、κ = 0.79），對這位受試者的整夜結構有把握。片段挑選避開階段邊界、排除 >150 µV 的雜訊；清醒期另外排除振幅 >80 µV 的眼動／汗液漂移片段，否則 EMD 的能量會被 0.3 Hz 的漂移主導。</p></div></details>
-      <details><summary>部署：為什麼是 GitHub Pages 而不是 Zeabur？</summary><div class="a"><p>作業原本要求部署到 Zeabur。查閱 Zeabur 官方文件（2026 年 9 月）後確認其「共享叢集」已停止服務，新帳號必須先綁定付費的專用伺服器才能建立專案；因此以 GitHub Pages 作為主要的公開網址。repo 內已放入與同學（klab-emd.zeabur.app）相同格式的 <code>zeabur.json</code> 靜態設定與 Cloudflare Workers 的 <code>wrangler.jsonc</code>，有可建立專案的帳號時，選這個 repo、類型 Static 即可部署，不需修改任何檔案。本站是純靜態網站，不需要任何後端。</p></div></details>
+      <details><summary>部署：為什麼是 GitHub Pages 而不是 Zeabur？</summary><div class="a"><p>作業原本要求部署到 Zeabur。查閱 Zeabur 官方文件（2026 年 9 月）後確認其「共享叢集」已停止服務，新帳號必須先綁定付費的專用伺服器才能建立專案；2026-09-23 以 Zeabur CLI 實測，建立專案時 API 回覆「Shared clusters are deprecated. Please rent a Server」，最便宜的伺服器為每月 3 美元。因此改為雙平台：<strong>GitHub Pages</strong>（主要網址）與 <strong>Cloudflare Workers</strong>（<a href="https://emd-sleep-explorer.emd-sleep-explorer.workers.dev" target="_blank" rel="noopener">emd-sleep-explorer.emd-sleep-explorer.workers.dev</a>，以 <code>wrangler.jsonc</code> 靜態資產模式部署）。repo 內同時保留 <code>zeabur.json</code> 與一鍵腳本 <code>tools/deploy_zeabur.sh</code>，租用伺服器後即可部署，不需修改任何檔案。本站是純靜態網站，不需要任何後端。</p></div></details>
       <details><summary>我們怎麼確認自己寫的 EMD 是對的？</summary><div class="a"><p>兩層驗證。第一層是有解析解的單元測試（<code>tests/test_emd.mjs</code>）：Bluestein FFT 對照直接 DFT、Hilbert 轉換對純音給出正確的瞬時頻率與振幅、EMD 完備重建（誤差 10⁻¹⁴）、雙音分離、模態混疊下 EEMD 優於 EMD。第二層是與 Python 套件 PyEMD 在同樣 16 個真實 epoch 上交叉比對（<a href="https://github.com/Kateep010/emd-sleep-explorer/blob/main/docs/validation.md" target="_blank" rel="noopener">docs/validation.md</a>）：用本站預設的 Huang 1998 SD 準則時，前三階 IMF 的相關係數中位數 0.69；把 PyEMD 額外的「極大值全為正、極小值全為負」條件也加進來（<code>strictExtrema</code> 選項）後升到 0.83，高、低頻合計的相關係數 0.87／0.89。結論：差異來自停止準則而非實作錯誤，而且 PyEMD 多篩幾次會把 IMF1 的頻率系統性推高，正是「過度篩選」的實例。</p></div></details>
       <details><summary>整夜的結果說明了什麼？</summary><div class="a"><p>第 07 節把整夜 1128 個 epoch 全部做 EMD 與 EEMD。只用「δ 頻帶 IMF 能量占比」與「訊號 RMS」兩個特徵、最近質心分類器，留一法準確率 68%、κ 0.58，N3 幾乎全對、N1 幾乎全錯。把 10 個摘要特徵交給 k-NN 後升到 83%；改用 EEMD 特徵（模態對齊、σ／α 能量不再幾乎為 0）再升到 84.5%、κ 0.79，與 Week 1 作業用 YASA（數十個頻譜特徵 + LightGBM）在同一位受試者得到的 84.2%、κ 0.79 相當。這說明 IMF 特徵確實蘊含了睡眠結構的主要資訊，而且 EEMD 對「特徵對齊」的幫助是可量化的——正是 Hassan 與 Bhuiyan 系列論文走的路。但這是單一受試者內的留一法，相鄰 epoch 高度相關，數字比跨受試者驗證樂觀。</p></div></details>
       <details><summary>已知限制</summary><div class="a"><ul><li>EMD 沒有解析理論，結果對取樣率、雜訊、停止準則與邊界處理都敏感。</li><li>EEMD 的運算量是 EMD 的 N 倍；在瀏覽器裡 200 次集成約需 1 秒。</li><li>Hilbert 瞬時頻率在振幅接近 0 的時段會發散，Hilbert 譜在這些點不可靠。</li><li>只用單一受試者的單一導程；Fpz-Cz 靠近前額，易受眼動影響。</li></ul></div></details>
@@ -421,7 +422,7 @@
 <footer class="site">
   <div class="wrap">
     <p>資料來源：Kemp B, et al. Sleep-EDF Database Expanded (PhysioNet)，Open Data Commons Attribution License v1.0；受試者 SC4002E0，EEG Fpz-Cz。本站僅供教學，不作醫療用途。</p>
-    <p>程式碼：<a href="https://github.com/Kateep010/emd-sleep-explorer" target="_blank" rel="noopener">github.com/Kateep010/emd-sleep-explorer</a>（MIT）。EMD／EEMD／FFT／Hilbert 轉換皆為原生 JavaScript 實作，附 <code>tests/test_emd.mjs</code> 單元測試與 PyEMD 交叉驗證（<code>docs/validation.md</code>）。</p>
+    <p>網址：<a href="https://kateep010.github.io/emd-sleep-explorer/">GitHub Pages</a> · <a href="https://emd-sleep-explorer.emd-sleep-explorer.workers.dev">Cloudflare Workers</a>。程式碼：<a href="https://github.com/Kateep010/emd-sleep-explorer" target="_blank" rel="noopener">github.com/Kateep010/emd-sleep-explorer</a>（MIT）。EMD／EEMD／FFT／Hilbert 轉換皆為原生 JavaScript 實作，附 <code>tests/test_emd.mjs</code> 單元測試與 PyEMD 交叉驗證（<code>docs/validation.md</code>）。</p>
     <p>夜夜葉YA · AI Agent × Biomedical Signal Analysis 課程作業 · 黃鍔院士演講前導 · 2026 年 9 月。</p>
   </div>
 </footer>

@@ -7,7 +7,8 @@
 
 | | 連結 |
 | --- | --- |
-| 🌐 網站（GitHub Pages） | https://kateep010.github.io/emd-sleep-explorer/ |
+| 🌐 網站（GitHub Pages，主要） | https://kateep010.github.io/emd-sleep-explorer/ |
+| ☁️ 網站（Cloudflare Workers 鏡像） | https://emd-sleep-explorer.emd-sleep-explorer.workers.dev |
 | 💻 原始碼 | https://github.com/Kateep010/emd-sleep-explorer |
 
 ## 這個網站做什麼
@@ -68,9 +69,9 @@ node tests/test_emd.mjs
 
 | 平台 | 方式 | 狀態 |
 | --- | --- | --- |
-| **GitHub Pages** | Settings → Pages → Deploy from branch `main` / root | ✅ 已上線，每次 push 自動更新 |
+| **GitHub Pages** | Settings → Pages → Deploy from branch `main` / root | ✅ 已上線，每次 push 自動更新（主要網址） |
 | **Zeabur** | Zeabur 專案 → Deploy from Git → 選此 repo → 類型 Static（`zeabur.json` 已設定輸出目錄為根目錄，與同學 klab-emd.zeabur.app 相同做法） | ⚠️ 需可建立專案的 Zeabur 帳號；2026 年 9 月官方文件標示共享叢集已停止服務，新帳號需先綁定伺服器（見下） |
-| **Cloudflare Workers** | `npx wrangler login && npx wrangler deploy`（設定檔 `wrangler.jsonc`，static assets 模式） | 設定檔已備妥 |
+| **Cloudflare Workers** | `npx wrangler login && npx wrangler deploy`（設定檔 `wrangler.jsonc`，static assets 模式；`.assetsignore` 排除工具與文件） | ✅ 已上線：https://emd-sleep-explorer.emd-sleep-explorer.workers.dev |
 
 ### 一鍵腳本
 
