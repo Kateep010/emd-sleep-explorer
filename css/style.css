@@ -71,6 +71,7 @@ section.block > .wrap > h2 { display: flex; align-items: baseline; gap: 10px; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 @media (max-width: 760px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+.grid-2 > *, .grid-3 > *, .imf-row > *, .card { min-width: 0; }
 .formula { background: var(--surface-2); border-radius: 8px; padding: 10px 14px; margin: 8px 0 14px; font-family: "Times New Roman", "Noto Serif TC", serif; font-size: 1.05rem; overflow-x: auto; }
 .callout { border-left: 3px solid var(--accent); background: var(--surface-2); padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 12px 0 16px; }
 .callout.warn { border-color: var(--warn); }
@@ -121,7 +122,8 @@ progress { width: 160px; height: 8px; accent-color: var(--accent); }
 
 /* tables */
 table.data { width: 100%; border-collapse: collapse; font-size: .9rem; margin: 8px 0; }
-table.data th, table.data td { padding: 6px 8px; border-bottom: 1px solid var(--grid); text-align: right; font-variant-numeric: tabular-nums; }
+table.data th, table.data td { padding: 6px 8px; border-bottom: 1px solid var(--grid); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.data td:first-child { white-space: normal; }
 table.data th:first-child, table.data td:first-child { text-align: left; }
 table.data th { color: var(--muted); font-weight: 600; font-size: .82rem; }
 details.tbl summary { cursor: pointer; color: var(--accent); font-size: .92rem; margin: 6px 0; }

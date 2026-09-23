@@ -20,8 +20,9 @@
 | 04 Hilbert 譜 | Hilbert 譜 vs. STFT 頻譜圖、邊際譜 vs. 傅立葉譜 | 動態範圍切換，滑鼠讀值 |
 | 05 EEMD | 模態混疊的成因與 EEMD 的解法 | 合成「慢波 + 間歇紡錘波」，調整振幅、雜訊、集成次數 |
 | 06 睡眠分期 | Hassan & Bhuiyan 流程的簡化重現：IMF 特徵 → 散佈圖 → 留一法最近質心 | 任選兩個 IMF 特徵作 X/Y 軸 |
-| 07 文獻 | 16 篇以 Crossref DOI 查證的文獻，分方法／分期／呼吸中止／紡錘波四條線 | 標籤篩選 |
-| 08 討論 | 與 AI 討論的紀錄、設計決策、已知限制 | — |
+| 07 整夜 | 整夜 1128 個 epoch 的 IMF 特徵沿時間與專家 hypnogram 對照；各階段中位數；整夜留一法分類與混淆矩陣（δ 能量 × RMS：68 %、κ 0.58） | 特徵與平滑選擇、任選兩特徵分類 |
+| 08 文獻 | 25 篇以 Crossref DOI 查證的文獻，分方法／分期／呼吸中止／紡錘波／資料來源五條線 | 標籤篩選 |
+| 09 討論 | 與 AI 討論的紀錄、設計決策、驗證方式、已知限制 | — |
 
 ## 技術重點
 
@@ -29,6 +30,8 @@
   局部極值、自然三次樣條（Thomas 演算法）、Rilling 鏡像邊界延伸、篩選（SD 與 S-number 停止準則）、EMD、EEMD（可中斷的非同步版本）、
   任意長度 FFT（Bluestein）、Hilbert 轉換／瞬時頻率、Hilbert 譜、STFT 頻譜圖、功率譜。
 - **單元測試**：`node tests/test_emd.mjs`（樣條、FFT 對照直接 DFT、Hilbert 對純音的瞬時頻率、EMD 完備重建、雙音分離、模態混疊 EMD vs EEMD、16 個真實 epoch 的重建）。
+- **與 PyEMD 交叉驗證**：[`docs/validation.md`](docs/validation.md)。停止準則對齊後前三階 IMF 相關係數中位數 0.83，高／低頻合計 0.87／0.89；差異來源為停止準則與樣條種類，並示範了「過度篩選」的效應。
+- **整夜資料**：`data/night.js` 為 1128 個 epoch 的 IMF 特徵（`tools/dump_night.py` 匯出整夜 EEG → `tools/night_features.mjs` 以 `js/emd.js` 逐 epoch 計算，約 10 秒）。
 - **圖表**：`js/charts.js` 自製 canvas 折線圖／熱圖／散佈圖，含十字游標與 tooltip、鍵盤操作、HiDPI、深淺色主題。
 - **資料**：`data/epochs.json`（同內容的 `data/epochs.js` 供 `file://` 直接開啟）— Sleep-EDF Expanded 受試者 SC4002E0，EEG Fpz-Cz，100 Hz，
   每階段 3–4 個 30 秒 epoch，由 `tools/extract_epochs.py`（MNE + YASA）產生：避開階段邊界、排除 >150 µV 雜訊、N2 優先挑選含紡錘波片段、清醒期排除 >80 µV 眼動漂移。
@@ -62,6 +65,8 @@ node tests/test_emd.mjs
 
 ## 文獻（皆經 Crossref 查證）
 
+網站第 08 節共 25 篇；以下列出核心 16 篇，其餘 9 篇（Huang 2003 信賴區間、Flandrin 2004 濾波器組、Liang 2005 神經資料、Yeh 2010 CEEMD、Colominas 2014 ICEEMDAN、Huang 2016 HHSA、Hassan 2016 Biocybern.、Kemp 2000 與 Goldberger 2000 資料來源）見網站。
+
 1. Huang NE, et al. (1998). The empirical mode decomposition and the Hilbert spectrum for nonlinear and non-stationary time series analysis. *Proc. R. Soc. Lond. A* 454:903–995. doi:10.1098/rspa.1998.0193
 2. Huang NE, Wu Z, Long SR, Arnold KC, Chen X, Blank K (2009). On instantaneous frequency. *Adv. Adapt. Data Anal.* 1(2):177–229. doi:10.1142/S1793536909000096
 3. Wu Z, Huang NE (2009). Ensemble empirical mode decomposition: a noise-assisted data analysis method. *Adv. Adapt. Data Anal.* 1(1):1–41. doi:10.1142/S1793536909000047
@@ -86,5 +91,6 @@ Kemp B, Zwinderman AH, Tuk B, Kamphuisen HAC, Oberyé JJL. Sleep-EDF Database Ex
 
 ## 製作過程
 
-網站在 Claude Code（Claude Fable 5.1）協助下完成：文獻以 Crossref API 逐篇查證、演算法從論文重新實作並以單元測試驗證、
-真實資料以 MNE/YASA 抽取，圖表與版面經 headless Chromium 截圖檢查（深淺色、手機寬度）。討論與設計決策整理在網站第 08 節。
+網站在 Claude Code（Claude Fable 5.1）協助下完成：文獻以 Crossref API 逐篇查證、演算法從論文重新實作並以單元測試與 PyEMD 交叉驗證、
+真實資料以 MNE/YASA 抽取，圖表與版面經 headless Chromium 截圖檢查（深淺色、手機寬度）。討論與設計決策整理在網站第 09 節。
+也參考了同學公開的作品（howenyuan-ship-it/emd_sleep、chiayumd15/emd-sleep）在整夜資料與交叉驗證上的做法；本站的程式碼、資料處理與文字皆為獨立撰寫。

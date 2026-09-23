@@ -267,7 +267,51 @@
   for (const f of feats) { const tr = document.createElement('tr'); for (const v of [f.id, STAGES[f.stage].label, pct(f.E_delta), pct(f.E_theta), pct(f.E_alpha), pct(f.E_sigma), pct(f.E_beta), fmt1(f.IF1), fmt1(f.IF2), fmt1(f.IFdom), fmt1(f.RMS), fmt2(f.KURT1)]) { const td = document.createElement('td'); td.textContent = v; tr.appendChild(td); } tb.appendChild(tr); }
   renderStaging();
 
-  /* ---------------- 07 paper filter ---------------- */
+  /* ---------------- 07 whole night ---------------- */
+  (function () {
+    const NIGHT = window.SLEEP_NIGHT; if (!NIGHT) return; const NE = NIGHT.epochs, n = NE.length;
+    const ORDER = { N3: 0, N2: 1, N1: 2, REM: 3, W: 4 }, LBL = ['N3', 'N2', 'N1', 'REM', 'W'];
+    const NF = { d: 'δ 頻帶 IMF 能量占比（<4 Hz）', t: 'θ 頻帶 IMF 能量占比（4–8 Hz）', a: 'α 頻帶 IMF 能量占比（8–12 Hz）', g: 'σ 頻帶 IMF 能量占比（12–16 Hz）', b: 'β 以上 IMF 能量占比（>16 Hz）', f1: 'IMF1 平均瞬時頻率 (Hz)', fd: '能量最大 IMF 的平均瞬時頻率 (Hz)', r: '訊號 RMS (µV)', n: 'IMF 個數', k1: 'IMF1 峰度' };
+    const NFMT = { d: pct, t: pct, a: pct, g: pct, b: pct, f1: fmt1, fd: fmt1, r: fmt1, n: v => v.toFixed(0), k1: fmt2 };
+    const hrs = i => i * 30 / 3600;
+    let last = 'W'; const hx = [], hy = [];
+    NE.forEach((o, i) => { const st = ORDER[o.s] == null ? last : o.s; last = st; hx.push(hrs(i), hrs(i + 1)); hy.push(ORDER[st], ORDER[st]); });
+    const hyp = new Charts.LineChart($('#night-hypno'), { height: 215 });
+    hyp.setData({ series: [{ x: Float64Array.from(hx), y: Float64Array.from(hy), color: '--s7', label: '睡眠階段', width: 1.5 }], ylim: [-0.4, 4.4], yFmt: v => Number.isInteger(v) ? (LBL[v] || '') : '', xLabel: '自熄燈前 30 分鐘起算 (h)', xName: 't', xUnit: ' h', xFmt: fmt1, zeroLine: false, xlim: [0, hrs(n)] });
+    const bands = []; let cur = null;
+    NE.forEach((o, i) => { const key = o.s === 'N3' ? '--s4' : o.s === 'REM' ? '--s5' : null; if (cur && cur.color === key) cur.x1 = hrs(i + 1); else { if (cur) bands.push(cur); cur = key ? { x0: hrs(i), x1: hrs(i + 1), color: key } : null; } }); if (cur) bands.push(cur);
+    const fch = new Charts.LineChart($('#night-feat-chart'), { height: 210 });
+    for (const [k, l] of Object.entries(NF)) for (const id of ['night-feat', 'night-x', 'night-y']) { const o = document.createElement('option'); o.value = k; o.textContent = l; $('#' + id).appendChild(o); }
+    $('#night-feat').value = 'd'; $('#night-x').value = 'd'; $('#night-y').value = 'r';
+    function movingMedian(arr, w) { if (w <= 1) return arr; const h = Math.floor(w / 2); return arr.map((_, i) => { const s = arr.slice(Math.max(0, i - h), Math.min(arr.length, i + h + 1)).slice().sort((p, q) => p - q); return s[Math.floor(s.length / 2)]; }); }
+    function drawFeat() {
+      const k = $('#night-feat').value, w = +$('#night-smooth').value; const raw = NE.map(o => o[k]); const sm = movingMedian(raw, w);
+      const x = Float64Array.from(NE, (_, i) => hrs(i) + 30 / 7200);
+      const series = [{ x, y: Float64Array.from(raw), color: '--s1', label: NF[k], width: w > 1 ? 1 : 2, alpha: w > 1 ? 0.35 : 1 }];
+      if (w > 1) series.push({ x, y: Float64Array.from(sm), color: '--s1', label: `移動中位數（${w} 個 epoch）`, width: 2 });
+      fch.setData({ series, bands, xLabel: '自熄燈前 30 分鐘起算 (h)', yLabel: '', xName: 't', xUnit: ' h', xFmt: fmt1, yFmt: NFMT[k], xlim: [0, hrs(n)], zeroLine: false, legend: w > 1 });
+    }
+    $('#night-feat').addEventListener('change', drawFeat); $('#night-smooth').addEventListener('change', drawFeat); drawFeat();
+    const tb = $('#night-table'); const by = {}; for (const o of NE) (by[o.s] = by[o.s] || []).push(o);
+    const med = (arr, k) => { const v = arr.map(o => o[k]).sort((p, q) => p - q); return v[Math.floor(v.length / 2)]; };
+    for (const [k, l] of Object.entries(NF)) { const tr = document.createElement('tr'); const td0 = document.createElement('td'); td0.textContent = l; tr.appendChild(td0); for (const st of ['W', 'N1', 'N2', 'N3', 'REM']) { const td = document.createElement('td'); td.textContent = NFMT[k](med(by[st], k)); tr.appendChild(td); } tb.appendChild(tr); }
+    function classify() {
+      const kx = $('#night-x').value, ky = $('#night-y').value; const pts = NE.filter(o => ORDER[o.s] != null);
+      const mx = pts.reduce((s, o) => s + o[kx], 0) / pts.length, my = pts.reduce((s, o) => s + o[ky], 0) / pts.length;
+      const sx = Math.sqrt(pts.reduce((s, o) => s + (o[kx] - mx) ** 2, 0) / pts.length) || 1, sy = Math.sqrt(pts.reduce((s, o) => s + (o[ky] - my) ** 2, 0) / pts.length) || 1;
+      const sum = {}; for (const o of pts) { const c = sum[o.s] = sum[o.s] || { x: 0, y: 0, n: 0 }; c.x += (o[kx] - mx) / sx; c.y += (o[ky] - my) / sy; c.n++; }
+      const stages = ['W', 'N1', 'N2', 'N3', 'REM']; const cm = {}; for (const a of stages) { cm[a] = {}; for (const b of stages) cm[a][b] = 0; }
+      let correct = 0;
+      for (const o of pts) { const px = (o[kx] - mx) / sx, py = (o[ky] - my) / sy; let best = null, bd = Infinity; for (const st of stages) { const c = sum[st]; const nn = c.n - (st === o.s ? 1 : 0); if (nn <= 0) continue; const cx = (c.x - (st === o.s ? px : 0)) / nn, cy = (c.y - (st === o.s ? py : 0)) / nn; const d = (px - cx) ** 2 + (py - cy) ** 2; if (d < bd) { bd = d; best = st; } } cm[o.s][best]++; if (best === o.s) correct++; }
+      const N = pts.length; const po = correct / N; let pe = 0; for (const st of stages) { const row = stages.reduce((s, b) => s + cm[st][b], 0), col = stages.reduce((s, a) => s + cm[a][st], 0); pe += (row / N) * (col / N); } const kappa = (po - pe) / (1 - pe);
+      $('#night-acc').textContent = `準確率 ${(100 * po).toFixed(1)} %（${correct}/${N}）· Cohen's κ = ${kappa.toFixed(2)}`;
+      const body = $('#night-cm tbody'); body.replaceChildren();
+      for (const a of stages) { const tr = document.createElement('tr'); const td0 = document.createElement('td'); td0.textContent = a; tr.appendChild(td0); for (const b of stages) { const td = document.createElement('td'); td.textContent = cm[a][b]; if (a === b) td.style.fontWeight = '700'; tr.appendChild(td); } body.appendChild(tr); }
+    }
+    $('#night-x').addEventListener('change', classify); $('#night-y').addEventListener('change', classify); classify();
+  })();
+
+  /* ---------------- 08 paper filter ---------------- */
   $$('#paper-filter button').forEach(b => b.addEventListener('click', () => {
     $$('#paper-filter button').forEach(x => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true');
     const tag = b.dataset.tag; $$('.paper').forEach(p => { p.hidden = tag !== 'all' && !p.dataset.tags.split(' ').includes(tag); });

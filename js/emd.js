@@ -168,6 +168,7 @@
     maxSift: 50,        // safety cap against over-sifting
     maxImf: 12,
     nbsym: 2,
+    strictExtrema: false, // PyEMD-style extra IMF condition: every local maximum > 0 and every local minimum < 0
   };
 
   /** Huang's standard-deviation criterion between successive sifts. */
@@ -195,7 +196,8 @@
       iter++;
       if (trace) trace.push({ h: h, env, hNew, sd, nExt, nZc, iteration: iter });
       h = hNew; lastSD = sd;
-      const imfLike = Math.abs(nExt - nZc) <= 1;
+      let imfLike = Math.abs(nExt - nZc) <= 1;
+      if (imfLike && opts.strictExtrema) { for (const i of env.maxIdx) if (h[i] <= 0) { imfLike = false; break; } if (imfLike) for (const i of env.minIdx) if (h[i] >= 0) { imfLike = false; break; } }
       if (opts.sNumber > 0) { sCount = imfLike ? sCount + 1 : 0; if (sCount >= opts.sNumber) break; }
       else if (sd < opts.sdThreshold && imfLike) break;
     }
