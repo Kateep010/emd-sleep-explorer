@@ -19,8 +19,28 @@
     const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     const next = cur === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = next;
     try { localStorage.setItem('theme', next); } catch (e) { /* ignore */ }
-    Charts.redrawAll();
+    Charts.redrawAll(); document.dispatchEvent(new Event('themechange'));
   });
+
+  /* ---------------- hero wave (real N2 epoch + first 3 IMFs, scrolling) ---------------- */
+  (function () {
+    const cv = $('#hero-wave'); if (!cv) return; const ctx = cv.getContext('2d');
+    const ep = EPOCHS.find(e => e.stage === 'N2') || EPOCHS[0]; const x = Float64Array.from(ep.eeg); const dec = EMD.emd(x);
+    const layers = [{ y: x, color: '--s1', w: 1.6, a: .9 }, { y: dec.imfs[0], color: '--s3', w: 1.2, a: .7 }, { y: dec.imfs[1], color: '--s2', w: 1.2, a: .7 }, { y: dec.imfs[2], color: '--s7', w: 1.2, a: .7 }];
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches; let off = 0, raf = 0;
+    function draw() {
+      const dpr = window.devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return;
+      if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); } ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+      const n = x.length, span = 1200, base = [0.42, 0.62, 0.74, 0.86], amp = [0.16, 0.06, 0.06, 0.06];
+      layers.forEach((L, li) => { let mx = 0; for (let i = 0; i < n; i++) mx = Math.max(mx, Math.abs(L.y[i])); const sc = amp[li] * H / (mx || 1);
+        ctx.strokeStyle = Charts.tok(L.color); ctx.globalAlpha = L.a; ctx.lineWidth = L.w; ctx.beginPath();
+        for (let px = 0; px <= W; px += 2) { const i = (Math.floor(off + px / W * span) % n + n) % n; const yy = base[li] * H - L.y[i] * sc; px === 0 ? ctx.moveTo(px, yy) : ctx.lineTo(px, yy); } ctx.stroke(); });
+      ctx.globalAlpha = 1;
+    }
+    function loop() { off += 0.6; draw(); raf = requestAnimationFrame(loop); }
+    draw(); if (!reduce) { const io = new IntersectionObserver(en => { if (en[0].isIntersecting) { if (!raf) raf = requestAnimationFrame(loop); } else { cancelAnimationFrame(raf); raf = 0; } }); io.observe(cv); }
+    window.addEventListener('resize', draw); document.addEventListener('themechange', draw);
+  })();
 
   /* ---------------- 01 why ---------------- */
   const whySig = new Charts.LineChart($('#why-signal'), { height: 150 });
@@ -222,7 +242,7 @@
     const best = dec => Math.max(...dec.imfs.map(m => corr(m, tone)));
     $('#mix-metrics').textContent = `最能代表 1 Hz 慢波的 IMF 與真值的相關係數：EMD ${best(dEmd).toFixed(3)} → EEMD ${best(dEemd).toFixed(3)}（${ens} 次集成、雜訊 ${noise.toFixed(2)} σ）。EMD 共 ${dEmd.imfs.length} 個 IMF；EEMD 固定 4 個模態。`;
   }
-  runMix();
+  { const sec = $('#mixing'); const io = new IntersectionObserver(en => { if (en[0].isIntersecting) { io.disconnect(); runMix(); } }, { rootMargin: '400px' }); io.observe(sec); }
 
   /* ---------------- 06 staging features ---------------- */
   const FEATS = {
@@ -295,19 +315,30 @@
     const tb = $('#night-table'); const by = {}; for (const o of NE) (by[o.s] = by[o.s] || []).push(o);
     const med = (arr, k) => { const v = arr.map(o => o[k]).sort((p, q) => p - q); return v[Math.floor(v.length / 2)]; };
     for (const [k, l] of Object.entries(NF)) { const tr = document.createElement('tr'); const td0 = document.createElement('td'); td0.textContent = l; tr.appendChild(td0); for (const st of ['W', 'N1', 'N2', 'N3', 'REM']) { const td = document.createElement('td'); td.textContent = NFMT[k](med(by[st], k)); tr.appendChild(td); } tb.appendChild(tr); }
+    let EEMD_DATA = null, loadingEemd = false;
+    function featVec(o, fs) { const base = fs === 'two' ? [o[$('#night-x').value], o[$('#night-y').value]] : [o.d, o.t, o.a, o.g, o.b, o.f1, o.fd, o.r, o.k1, Math.log(o.r)]; if (fs === 'modes' && o.m) return base.concat(o.m.flatMap(m => [m[0], m[1]])); return base; }
     function classify() {
-      const kx = $('#night-x').value, ky = $('#night-y').value; const pts = NE.filter(o => ORDER[o.s] != null);
-      const mx = pts.reduce((s, o) => s + o[kx], 0) / pts.length, my = pts.reduce((s, o) => s + o[ky], 0) / pts.length;
-      const sx = Math.sqrt(pts.reduce((s, o) => s + (o[kx] - mx) ** 2, 0) / pts.length) || 1, sy = Math.sqrt(pts.reduce((s, o) => s + (o[ky] - my) ** 2, 0) / pts.length) || 1;
-      const sum = {}; for (const o of pts) { const c = sum[o.s] = sum[o.s] || { x: 0, y: 0, n: 0 }; c.x += (o[kx] - mx) / sx; c.y += (o[ky] - my) / sy; c.n++; }
-      const stages = ['W', 'N1', 'N2', 'N3', 'REM']; const cm = {}; for (const a of stages) { cm[a] = {}; for (const b of stages) cm[a][b] = 0; }
-      let correct = 0;
-      for (const o of pts) { const px = (o[kx] - mx) / sx, py = (o[ky] - my) / sy; let best = null, bd = Infinity; for (const st of stages) { const c = sum[st]; const nn = c.n - (st === o.s ? 1 : 0); if (nn <= 0) continue; const cx = (c.x - (st === o.s ? px : 0)) / nn, cy = (c.y - (st === o.s ? py : 0)) / nn; const d = (px - cx) ** 2 + (py - cy) ** 2; if (d < bd) { bd = d; best = st; } } cm[o.s][best]++; if (best === o.s) correct++; }
+      const src = $('#night-src').value, fs = $('#night-fs').value, clf = $('#night-clf').value;
+      $('#night-x').disabled = $('#night-y').disabled = fs !== 'two';
+      if (src === 'eemd' && !EEMD_DATA) { if (!loadingEemd) { loadingEemd = true; $('#night-acc').textContent = '載入 EEMD 特徵中…'; const sc = document.createElement('script'); sc.src = 'data/night_eemd.js'; sc.onload = () => { EEMD_DATA = window.SLEEP_NIGHT_EEMD.epochs; loadingEemd = false; classify(); }; sc.onerror = () => { loadingEemd = false; $('#night-acc').textContent = 'EEMD 特徵載入失敗。'; }; document.body.appendChild(sc); } return; }
+      const data = src === 'eemd' ? EEMD_DATA : NE; const fsUse = (fs === 'modes' && src !== 'eemd') ? 'all' : fs;
+      const stages = ['W', 'N1', 'N2', 'N3', 'REM']; const pts = data.filter(o => ORDER[o.s] != null); const X = pts.map(o => featVec(o, fsUse)); const D = X[0].length;
+      const mu = new Array(D).fill(0), sd = new Array(D).fill(0); for (const x of X) for (let j = 0; j < D; j++) mu[j] += x[j] / X.length; for (const x of X) for (let j = 0; j < D; j++) sd[j] += (x[j] - mu[j]) ** 2 / X.length;
+      const Z = X.map(x => x.map((v, j) => (v - mu[j]) / (Math.sqrt(sd[j]) || 1)));
+      const cm = {}; for (const a of stages) { cm[a] = {}; for (const b of stages) cm[a][b] = 0; } let correct = 0;
+      if (clf === 'nc') {
+        const sum = {}; pts.forEach((o, i) => { const c = sum[o.s] = sum[o.s] || { v: new Array(D).fill(0), n: 0 }; for (let j = 0; j < D; j++) c.v[j] += Z[i][j]; c.n++; });
+        pts.forEach((o, i) => { let best = null, bd = Infinity; for (const st of stages) { const c = sum[st]; const nn = c.n - (st === o.s ? 1 : 0); if (nn <= 0) continue; let d = 0; for (let j = 0; j < D; j++) { const cj = (c.v[j] - (st === o.s ? Z[i][j] : 0)) / nn; d += (Z[i][j] - cj) ** 2; } if (d < bd) { bd = d; best = st; } } cm[o.s][best]++; if (best === o.s) correct++; });
+      } else {
+        const k = 7;
+        pts.forEach((o, i) => { const ds = []; for (let q = 0; q < Z.length; q++) { if (q === i) continue; let d = 0; for (let j = 0; j < D; j++) d += (Z[i][j] - Z[q][j]) ** 2; ds.push([d, pts[q].s]); } ds.sort((p, q) => p[0] - q[0]); const votes = {}; for (let t = 0; t < k; t++) votes[ds[t][1]] = (votes[ds[t][1]] || 0) + 1; const best = Object.entries(votes).sort((p, q) => q[1] - p[1])[0][0]; cm[o.s][best]++; if (best === o.s) correct++; });
+      }
       const N = pts.length; const po = correct / N; let pe = 0; for (const st of stages) { const row = stages.reduce((s, b) => s + cm[st][b], 0), col = stages.reduce((s, a) => s + cm[a][st], 0); pe += (row / N) * (col / N); } const kappa = (po - pe) / (1 - pe);
-      $('#night-acc').textContent = `準確率 ${(100 * po).toFixed(1)} %（${correct}/${N}）· Cohen's κ = ${kappa.toFixed(2)}`;
+      $('#night-acc').textContent = `${src === 'eemd' ? 'EEMD' : 'EMD'} 特徵 · ${D} 個特徵 · ${clf === 'nc' ? '最近質心' : 'k-NN (k=7)'}：準確率 ${(100 * po).toFixed(1)} %（${correct}/${N}）· Cohen's κ = ${kappa.toFixed(2)}`;
       const body = $('#night-cm tbody'); body.replaceChildren();
       for (const a of stages) { const tr = document.createElement('tr'); const td0 = document.createElement('td'); td0.textContent = a; tr.appendChild(td0); for (const b of stages) { const td = document.createElement('td'); td.textContent = cm[a][b]; if (a === b) td.style.fontWeight = '700'; tr.appendChild(td); } body.appendChild(tr); }
     }
+    for (const id of ['night-src', 'night-fs', 'night-clf']) $('#' + id).addEventListener('change', classify);
     $('#night-x').addEventListener('change', classify); $('#night-y').addEventListener('change', classify); classify();
   })();
 
