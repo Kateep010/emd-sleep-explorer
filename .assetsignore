@@ -1,0 +1,11 @@
+.git
+.gitignore
+.DS_Store
+.wrangler
+node_modules
+tools
+tests
+docs
+wrangler.jsonc
+zeabur.json
+.assetsignore
