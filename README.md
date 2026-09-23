@@ -1,5 +1,19 @@
 # 夜夜葉YA — EMD × 睡眠腦波互動導覽
 
+## 繳交資訊
+
+**作業：EMD 在睡眠研究中的意義 — 互動演算法網站「夜夜葉YA」**
+
+- 網站（GitHub Pages，主要）：https://kateep010.github.io/emd-sleep-explorer/
+- 網站（Cloudflare Workers 鏡像）：https://emd-sleep-explorer.emd-sleep-explorer.workers.dev
+- GitHub：https://github.com/Kateep010/emd-sleep-explorer
+
+本網站以黃鍔院士的經驗模態分解（EMD）為主題，所有演算法（EMD、EEMD、Hilbert 轉換、FFT）皆以原生 JavaScript 從頭實作，附單元測試與 PyEMD 交叉驗證，並直接對 PhysioNet Sleep-EDF 真實整夜腦波（受試者 SC4002E0，1128 個 epoch）在瀏覽器即時運算。內容共十節：黃鍔院士生平與論文時間線、傅立葉分析的盲點與瞬時頻率、篩選（sifting）逐步動畫、五個睡眠階段的真實腦波 IMF 分解、Hilbert 譜與 STFT 對照、模態混疊與 EEMD、IMF 特徵散佈圖、整夜特徵與睡眠圖對照及留一法分類（EEMD 特徵加 k-NN 達 84.5%、κ 0.79，與 YASA 相當）、25 篇經 Crossref 查證的文獻，以及與 AI 討論的紀錄、設計決策與限制。
+
+部署說明：作業原規劃部署至 Zeabur。經 Zeabur CLI 實測，建立專案時 API 回覆「Shared clusters are deprecated. Please rent a Server」，即共享叢集已停用、需租用付費伺服器（最低每月 3 美元）。因此改以 GitHub Pages 與 Cloudflare Workers 雙平台部署，兩者皆為公開的靜態網站；GitHub Pages 與 repository 連動，每次 push 自動重新部署。Repository 內同時保留 Zeabur 靜態設定（zeabur.json）與一鍵部署腳本，租用伺服器後即可直接部署。
+
+---
+
 > 把一夜的腦波，一葉一葉剝開。
 > AI Agent × Biomedical Signal Analysis 課程作業（黃鍔院士演講前導）。主題：**經驗模態分解（EMD）在睡眠研究中的意義**。
 
