@@ -1,8 +1,8 @@
-# 夜夜葉YA — EMD × 睡眠腦波互動導覽
+# 夜夜YAYA — EMD × 睡眠腦波互動導覽
 
 ## 繳交資訊
 
-**作業：EMD 在睡眠研究中的意義 — 互動演算法網站「夜夜葉YA」**
+**作業：EMD 在睡眠研究中的意義 — 互動演算法網站「夜夜YAYA」**
 
 - 網站（GitHub Pages，主要）：https://kateep010.github.io/emd-sleep-explorer/
 - 網站（Cloudflare Workers 鏡像）：https://emd-sleep-explorer.emd-sleep-explorer.workers.dev
@@ -17,7 +17,7 @@
 > 把一夜的腦波，一葉一葉剝開。
 > AI Agent × Biomedical Signal Analysis 課程作業（黃鍔院士演講前導）。主題：**經驗模態分解（EMD）在睡眠研究中的意義**。
 
-![夜夜葉YA 網站預覽](preview.jpg)
+![夜夜YAYA 網站預覽](preview.jpg)
 
 | | 連結 |
 | --- | --- |

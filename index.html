@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>夜夜葉YA — EMD × 睡眠腦波互動導覽</title>
-<meta name="description" content="夜夜葉YA：用真實的 PhysioNet Sleep-EDF 睡眠腦波，在瀏覽器裡一步步執行黃鍔院士的經驗模態分解（EMD）、EEMD 與 Hilbert 譜，把一夜的腦波一葉一葉剝開。">
-<meta property="og:title" content="夜夜葉YA — EMD × 睡眠腦波互動導覽">
+<title>夜夜YAYA — EMD × 睡眠腦波互動導覽</title>
+<meta name="description" content="夜夜YAYA：用真實的 PhysioNet Sleep-EDF 睡眠腦波，在瀏覽器裡一步步執行黃鍔院士的經驗模態分解（EMD）、EEMD 與 Hilbert 譜，把一夜的腦波一葉一葉剝開。">
+<meta property="og:title" content="夜夜YAYA — EMD × 睡眠腦波互動導覽">
 <meta property="og:image" content="https://kateep010.github.io/emd-sleep-explorer/preview.jpg">
 <meta property="og:description" content="互動式演算法網站：從篩選（sifting）到 Hilbert 譜，從模態混疊到整夜睡眠結構與自動分期，附 25 篇經查證的文獻。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%230d1b2a'/%3E%3Cpath d='M9 23C9 13 16 8 24 8c0 8-5 15-15 15z' fill='%231baf7a'/%3E%3Cpath d='M10 22l10-10' stroke='%230d1b2a' stroke-width='1.6' stroke-linecap='round'/%3E%3Cpath d='M6 26c2-3 3-3 5 0s3 3 5 0 3-3 5 0 3 3 5 0' fill='none' stroke='%233987e5' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -15,7 +15,7 @@
 <body>
 <header class="site-header">
   <div class="wrap">
-    <a class="brand" href="#top"><svg class="leaf" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 23C9 13 16 8 24 8c0 8-5 15-15 15z" fill="var(--s3)"/><path d="M10 22l10-10" stroke="var(--bg)" stroke-width="1.6" stroke-linecap="round"/></svg>夜夜葉YA<small>EMD × 睡眠腦波</small></a>
+    <a class="brand" href="#top"><svg class="leaf" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 23C9 13 16 8 24 8c0 8-5 15-15 15z" fill="var(--s3)"/><path d="M10 22l10-10" stroke="var(--bg)" stroke-width="1.6" stroke-linecap="round"/></svg>夜夜YAYA<small>EMD × 睡眠腦波</small></a>
     <nav class="top" aria-label="章節">
       <a href="#huang">黃鍔院士</a><a href="#why">為什麼</a><a href="#algorithm">演算法</a><a href="#real">真實腦波</a><a href="#hilbert">Hilbert 譜</a><a href="#mixing">EEMD</a><a href="#staging">睡眠分期</a><a href="#night">整夜</a><a href="#papers">文獻</a><a href="#discussion">討論</a>
     </nav>
@@ -28,7 +28,7 @@
   <canvas id="hero-wave" class="hero-wave" aria-hidden="true"></canvas>
   <div class="wrap hero-inner">
     <p class="eyebrow">黃鍔院士 · Empirical Mode Decomposition × Sleep EEG</p>
-    <h1><span class="brand-big">夜夜葉<em>YA</em></span><span class="sub">把一夜的腦波，一葉一葉剝開</span></h1>
+    <h1><span class="brand-big">夜夜<em>YAYA</em></span><span class="sub">把一夜的腦波，一葉一葉剝開</span></h1>
     <p class="lead">睡眠腦波是典型的<strong>非線性、非平穩</strong>訊號：紡錘波突然出現又消失、慢波的振幅與頻率隨時間漂移。黃鍔院士 1998 年提出的經驗模態分解（EMD）不預設任何基底函數，而是讓資料自己「說出」它包含哪些尺度，一層一層（一葉一葉）剝出本質模態函數。這個網站把 EMD、EEMD 與 Hilbert 譜的每一步做成可以動手操作的實驗，並直接對<strong>真實的 PhysioNet Sleep-EDF 整夜腦波</strong>即時運算。</p>
     <ul class="chips">
       <li>演算法全部以原生 JavaScript 從頭實作，附單元測試與 PyEMD 交叉驗證</li>
@@ -423,7 +423,7 @@
   <div class="wrap">
     <p>資料來源：Kemp B, et al. Sleep-EDF Database Expanded (PhysioNet)，Open Data Commons Attribution License v1.0；受試者 SC4002E0，EEG Fpz-Cz。本站僅供教學，不作醫療用途。</p>
     <p>網址：<a href="https://kateep010.github.io/emd-sleep-explorer/">GitHub Pages</a> · <a href="https://emd-sleep-explorer.emd-sleep-explorer.workers.dev">Cloudflare Workers</a>。程式碼：<a href="https://github.com/Kateep010/emd-sleep-explorer" target="_blank" rel="noopener">github.com/Kateep010/emd-sleep-explorer</a>（MIT）。EMD／EEMD／FFT／Hilbert 轉換皆為原生 JavaScript 實作，附 <code>tests/test_emd.mjs</code> 單元測試與 PyEMD 交叉驗證（<code>docs/validation.md</code>）。</p>
-    <p>夜夜葉YA · AI Agent × Biomedical Signal Analysis 課程作業 · 黃鍔院士演講前導 · 2026 年 9 月。</p>
+    <p>夜夜YAYA · AI Agent × Biomedical Signal Analysis 課程作業 · 黃鍔院士演講前導 · 2026 年 9 月。</p>
   </div>
 </footer>
 
