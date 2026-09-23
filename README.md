@@ -72,12 +72,17 @@ node tests/test_emd.mjs
 | **Zeabur** | Zeabur 專案 → Deploy from Git → 選此 repo → 類型 Static（`zeabur.json` 已設定輸出目錄為根目錄，與同學 klab-emd.zeabur.app 相同做法） | ⚠️ 需可建立專案的 Zeabur 帳號；2026 年 9 月官方文件標示共享叢集已停止服務，新帳號需先綁定伺服器（見下） |
 | **Cloudflare Workers** | `npx wrangler login && npx wrangler deploy`（設定檔 `wrangler.jsonc`，static assets 模式） | 設定檔已備妥 |
 
+### 一鍵腳本
+
+- Zeabur：`tools/deploy_zeabur.sh`（需先 `npx zeabur@latest auth login`，且帳號已有伺服器）
+- Cloudflare Workers：`tools/deploy_cloudflare.sh`（需先 `npx wrangler login`）
+
 ### 關於 Zeabur
 
 作業原規劃部署至 Zeabur。查閱 Zeabur 官方文件（[專用伺服器](https://zeabur.com/docs/zh-TW/dedicated-server)、[Free Plan](https://zeabur.com/docs/en-US/pricing/free-plan)）後確認：
 「共享叢集（已停止服務）」，建立專案前必須先綁定或購買伺服器（按月固定計費）。
-因此以 GitHub Pages 作為主要公開網址；repo 已是 Zeabur 可直接辨識的靜態專案，若日後綁定伺服器，
-在 Zeabur 控制台選擇此 repo 即可部署，無需修改任何檔案。
+2026-09-23 實測 Zeabur CLI 建立專案時 API 回覆：`Shared clusters are deprecated. Please rent a Server and use server-XXXXXXXX as the region code.`
+因此以 GitHub Pages 作為主要公開網址；租用伺服器後執行 `tools/deploy_zeabur.sh` 即可部署，無需修改任何檔案。
 
 ## 文獻（皆經 Crossref 查證）
 
